@@ -1,0 +1,68 @@
+use alienfile;
+
+use File::chdir;
+
+configure {
+  requires 'File::chdir' => 0;
+};
+
+plugin PkgConfig => 'box2d';
+
+share {
+
+  # Temporarily build from master, until 2.3.2 is released
+  start_url 'https://github.com/erincatto/Box2D/archive/'
+    . 'f655c603ba9d83f07fc566d38d2654ba35739102.zip';
+  plugin 'Download';
+  plugin 'Extract' => 'zip';
+
+  # This will be used when Box2D releases its next version
+  #
+  # start_url 'https://github.com/erincatto/Box2D/releases';
+  #
+  # plugin 'Download' => (
+  #   version => qr/v([0-9\.]+)/,
+  #   filter  => qr/\.tar\.gz$/,
+  # );
+  #
+  # plugin 'Decode::HTML';
+  # plugin 'Extract' => 'tar.gz';
+
+  plugin 'Build::Premake';
+
+  build sub {
+    my ($build) = @_;
+
+    my $extract = Path::Tiny::path($build->install_prop->{extract});
+    my $install = Path::Tiny::path($build->install_prop->{prefix});
+
+    {
+      local $CWD = $extract->child('Box2D')->stringify;
+      $build->system('%{premake}', 'gmake');
+    }
+
+    {
+      local $CWD = $extract->child('Box2D', 'Build', 'gmake')->stringify;
+      $build->system('%{make}', 'config=release');
+    }
+
+    # Box2D makefiles do not define an install target
+    my $libs = $install->child('lib');
+    my $bins = $install->child('bin');
+
+    my $source = $extract->child('Box2D', 'gmake', 'bin', 'Release');
+    $source->visit(
+      sub {
+        if ($_->basename =~ /\.a$/) {
+          $libs->mkpath unless -e $libs;
+          $_->copy($libs->child($_->basename));
+        }
+        else {
+          $bins->mkpath unless -e $bins;
+          $_->copy($bins->child($_->basename));
+        }
+      },
+      { recurse => 1 },
+    );
+  };
+};
