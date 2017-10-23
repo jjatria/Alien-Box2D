@@ -43,3 +43,4 @@ my $rv = system($exe);
 is $rv, 0, 'Executing test1';
 
 unlink $exe;
+unlink $obj;
