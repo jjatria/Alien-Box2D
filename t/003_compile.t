@@ -17,8 +17,8 @@ my %cppflags = $cppguess->module_build_options;
 my $libs = Alien::Box2D->libs;
 $libs = ExtUtils::Liblist->ext($libs) if $Config{cc} =~ /cl/;
 
-my $cflags = Alien::Box2D->cflags . ' ' . $cppflags{extra_compiler_flags} . ' ' . $Config{ccflags};
-my $lflags = $libs . ' ' . $cppflags{extra_linker_flags} . ' ' . $Config{ldflags};
+my $cflags = join q{ },
+  Alien::Box2D->cflags, $cppflags{extra_compiler_flags}, $Config{ccflags};
 
 my $lflags = join q{ }, $libs, $cppflags{extra_linker_flags}, $Config{ldflags};
 
