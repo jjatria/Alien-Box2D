@@ -1,11 +1,14 @@
 package Alien::Box2D;
+
+our $VERSION = '0.105';
+
 use strict;
 use warnings;
-use Alien::Box2D::ConfigData;
-use File::ShareDir qw(dist_dir);
-use File::Spec;
-use File::Find;
-use File::Spec::Functions qw(catdir catfile rel2abs);
+use base 'Alien::Base';
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -14,11 +17,6 @@ Alien::Box2D - Build and make available Box2D library - L<http://box2d.org/>
 =head1 VERSION
 
 Version 0.105
-
-=cut
-
-our $VERSION = '0.105';
-$VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
 
@@ -107,28 +105,3 @@ misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 
 =cut
-
-### get config params
-sub config
-{
-  my ($package, $param) = @_;
-  return _box2d_config_via_config_data($param) if(Alien::Box2D::ConfigData->config('config'));
-}
-
-### internal functions
-sub _box2d_config_via_config_data
-{
-  my ($param) = @_;
-  my $share_dir = dist_dir('Alien-Box2D');
-  my $subdir = Alien::Box2D::ConfigData->config('share_subdir');
-  return unless $subdir;
-  my $real_prefix = catdir($share_dir, $subdir);
-  return unless ($param =~ /[a-z0-9_]*/i);
-  my $val = Alien::Box2D::ConfigData->config('config')->{$param};
-  return unless $val;
-  # handle @PrEfIx@ replacement
-  $val =~ s/\@PrEfIx\@/$real_prefix/g;
-  return $val;
-}
-
-1;
