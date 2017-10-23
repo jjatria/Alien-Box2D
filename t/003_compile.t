@@ -42,5 +42,5 @@ is defined $exe, 1, 'Linking test1.c';
 my $rv = system($exe);
 is $rv, 0, 'Executing test1';
 
-unlink $exe;
-unlink $obj;
+unlink $exe if $exe;
+unlink $obj if $obj;
