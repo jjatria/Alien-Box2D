@@ -2,6 +2,6 @@
 
 use Test::More tests => 1;
 
-BEGIN { use_ok( 'Alien::Box2D' ); }
+BEGIN { use_ok 'Alien::Box2D'; }
 
-diag( "Testing Alien::Box2D $Alien::Box2D::VERSION, Perl $], $^X" );
+diag "Testing Alien::Box2D $Alien::Box2D::VERSION, Perl $], $^X";
