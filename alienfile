@@ -33,18 +33,15 @@ share {
   build sub {
     my ($build) = @_;
 
+    local $CWD;
     my $extract = Path::Tiny::path($build->install_prop->{extract});
     my $install = Path::Tiny::path($build->install_prop->{prefix});
 
-    {
-      local $CWD = $extract->child('Box2D')->stringify;
-      $build->system('%{premake}', 'gmake');
-    }
+    $CWD = $extract->child('Box2D')->stringify;
+    $build->system('%{premake}', 'gmake');
 
-    {
-      local $CWD = $extract->child('Box2D', 'Build', 'gmake')->stringify;
-      $build->system('%{make}', 'config=release');
-    }
+    $CWD = $extract->child(qw( Box2D Build gmake ))->stringify;
+    $build->system('%{make}', 'config=release');
 
     # Box2D makefiles do not define an install target
     my $libs = $install->child('lib');
