@@ -1,4 +1,5 @@
 package Alien::Box2D;
+# ABSTRACT: Build and make available Box2D library
 
 our $VERSION = '0.105';
 
@@ -10,18 +11,7 @@ use base 'Alien::Base';
 
 __END__
 
-=head1 NAME
-
-Alien::Box2D - Build and make available Box2D library - L<http://box2d.org/>
-
-=head1 VERSION
-
-Version 0.105
-
 =head1 SYNOPSIS
-
-You can use Alien::Box2D in your module that needs to link with I<Box2D>
-library like this:
 
     # Sample Build.pl
     use Module::Build;
@@ -31,36 +21,29 @@ library like this:
       module_name => 'Any::Box2D::Module',
       # + other params
       build_requires => {
-                    'Alien::Box2D' => 0,
-                    # + others modules
+        'Alien::Box2D' => 0,
+        # + others modules
       },
       configure_requires => {
-                    'Alien::Box2D' => 0,
-                    # + others modules
+        'Alien::Box2D' => 0,
+        # + others modules
       },
-      extra_compiler_flags => Alien::Box2D->config('cflags'),
-      extra_linker_flags   => Alien::Box2D->config('libs'),
+      extra_compiler_flags => Alien::Box2D->cflags,
+      extra_linker_flags   => Alien::Box2D->libs,
     )->create_build_script;
 
-NOTE: Alien::Box2D is required only for building not for using 'Any::Box2D::Module'.
+Please note that Alien::Box2D is required only for building, not for using
+I<Any::Box2D::Module>.
 
 =head1 DESCRIPTION
 
-Alien::Box2D during its installation downloads Box2D library source codes,
-builds I<Box2D> binaries from source codes and installs necessary dev files
-(headers: *.h, static library: *.a) into I<share> directory of Alien::Box2D
-distribution.
+Installing Alien::Box2D will look for an available Box2D library in your system,
+or build one from source if one cannot be found. If installing one from source,
+development files (including headers and static libraries) will be stored in
+the I<share> directory of the distribution.
 
-=head1 METHODS
-
-=head2 config()
-
-This function is the main public interface to this module:
-
-    Alien::Box2D->config('prefix');
-    Alien::Box2D->config('version');
-    Alien::Box2D->config('libs');
-    Alien::Box2D->config('cflags');
+Alien::Box2D inherits its methods from L<Alien::Base>, so the interface for both
+should be the same.
 
 =head1 BUGS
 
@@ -74,17 +57,18 @@ KMX, E<lt>kmx at cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Please notice that the source code of Box2D library has a different license than module itself.
+Please note that the source code of the Box2D library is licensed under
+different terms from those of this distribution.
 
 =head2 Alien::Box2D perl module
 
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+The full text of the license can be found in the LICENSE file included with
+this distribution.
 
-=head2 Source code of Box2D library
+=head2 Box2D library
 
 Copyright (c) 2006-2010 Erin Catto http://www.gphysics.com
 
