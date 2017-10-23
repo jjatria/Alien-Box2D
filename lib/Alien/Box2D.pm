@@ -1,5 +1,5 @@
 package Alien::Box2D;
-# ABSTRACT: Build and make available Box2D library
+# ABSTRACT: Find or build the Box2D library
 
 our $VERSION = '0.105';
 
@@ -10,6 +10,10 @@ use base 'Alien::Base';
 1;
 
 __END__
+
+=head1 NAME
+
+Alien::Box2D - Find or build the Box2D library
 
 =head1 SYNOPSIS
 
