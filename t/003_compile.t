@@ -1,10 +1,14 @@
 # t/002_config.t - test config() functionality
 
+use Class::Load qw( try_load_class );
 use Test::More;
 use Alien::Box2D;
 use ExtUtils::CppGuess;
 use ExtUtils::Liblist;
 use Config;
+
+plan skip_all => 'ExtUtils::CBuilder 0.2703 required for this test'
+  unless try_load_class 'ExtUtils::CBuilder', { -version => 0.2703 };
 
 my $cppguess = ExtUtils::CppGuess->new;
 my %cppflags = $cppguess->module_build_options;
@@ -16,8 +20,7 @@ $libs = ExtUtils::Liblist->ext($libs) if $Config{cc} =~ /cl/;
 my $cflags = Alien::Box2D->cflags . ' ' . $cppflags{extra_compiler_flags} . ' ' . $Config{ccflags};
 my $lflags = $libs . ' ' . $cppflags{extra_linker_flags} . ' ' . $Config{ldflags};
 
-eval "use ExtUtils::CBuilder 0.2703";
-plan skip_all => "ExtUtils::CBuilder 0.2703 required for this test" if $@;
+my $lflags = join q{ }, $libs, $cppflags{extra_linker_flags}, $Config{ldflags};
 
 plan tests => 3;
 
