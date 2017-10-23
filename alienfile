@@ -28,7 +28,7 @@ share {
   # plugin 'Decode::HTML';
   # plugin 'Extract' => 'tar.gz';
 
-  plugin 'Build::Premake';
+  plugin 'Build::Premake5';
 
   build sub {
     my ($build) = @_;
@@ -37,7 +37,7 @@ share {
     my $extract = Path::Tiny::path($build->install_prop->{extract});
 
     $CWD = $extract->child('Box2D')->stringify;
-    $build->system('%{premake}', 'gmake');
+    $build->system('%{premake5}', 'gmake');
 
     $CWD = $extract->child(qw( Box2D Build gmake ))->stringify;
     $build->system('%{make}', 'config=release');
