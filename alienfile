@@ -35,7 +35,6 @@ share {
 
     local $CWD;
     my $extract = Path::Tiny::path($build->install_prop->{extract});
-    my $install = Path::Tiny::path($build->install_prop->{prefix});
 
     $CWD = $extract->child('Box2D')->stringify;
     $build->system('%{premake}', 'gmake');
@@ -44,22 +43,54 @@ share {
     $build->system('%{make}', 'config=release');
 
     # Box2D makefiles do not define an install target
-    my $libs = $install->child('lib');
-    my $bins = $install->child('bin');
+    _install($build);
+  };
+};
 
-    my $source = $extract->child('Box2D', 'gmake', 'bin', 'Release');
+sub _install {
+  my ($build) = @_;
+
+  my $extract = Path::Tiny::path($build->install_prop->{extract});
+  my $install = Path::Tiny::path($build->install_prop->{prefix});
+
+  foreach (
+      [ 'lib'           => qr{\.a$}, qw( Box2D Build gmake bin Release )],
+      [ 'include/Box2D' => qr{\.h$}, qw( Box2D Box2D                   )],
+    ) {
+
+    my ($dir, $regex, @parts) = @{$_};
+
+    my $source = $extract->child(@parts);
     $source->visit(
       sub {
-        if ($_->basename =~ /\.a$/) {
-          $libs->mkpath unless -e $libs;
-          $_->copy($libs->child($_->basename));
-        }
-        else {
-          $bins->mkpath unless -e $bins;
-          $_->copy($bins->child($_->basename));
+        if ($_->basename =~ $regex) {
+          my $path = $_->relative($source);
+          my $target = $install->child($dir, $path);
+          $target->parent->mkpath;
+          $_->copy($target);
         }
       },
       { recurse => 1 },
     );
-  };
-};
+  }
+
+  my $file = $extract->child(qw( Box2D Box2D Common b2Settings.cpp ));
+
+  my ($version) = grep { /version\s?=\s?\{[\d\s,]+\}/ } $file->lines;
+  my @parts = $version =~ /([0-9]+)\s?[,\}]/g;
+  $version = (@parts == 3) ? join '.', @parts : '';
+
+  my $pkgconfig = $install->child(qw( lib pkgconfig box2d.pc ))->touchpath;
+  my $fh = $pkgconfig->openw;
+
+  print $fh 'prefix=' . $install                            . "\n";
+  print $fh 'exec_prefix=${prefix}'                         . "\n";
+  print $fh 'includedir=${prefix}/include'                  . "\n";
+  print $fh 'libdir=${prefix}/lib'                          . "\n";
+  print $fh "\n";
+  print $fh 'Name: Box2D'                                   . "\n";
+  print $fh 'Description: 2D physics engine'                . "\n";
+  print $fh 'Version: ' . $version                          . "\n";
+  print $fh 'Cflags: -I${includedir} -I${includedir}/Box2D' . "\n";
+  print $fh 'Libs: -L${libdir} -lBox2D'                     . "\n";
+}
