@@ -84,14 +84,14 @@ sub _install {
   my $pkgconfig = $install->child(qw( lib pkgconfig box2d.pc ))->touchpath;
   my $fh = $pkgconfig->openw;
 
-  print $fh 'prefix=' . $install                            . "\n";
-  print $fh 'exec_prefix=${prefix}'                         . "\n";
-  print $fh 'includedir=${prefix}/include'                  . "\n";
-  print $fh 'libdir=${prefix}/lib'                          . "\n";
-  print $fh "\n";
-  print $fh 'Name: Box2D'                                   . "\n";
-  print $fh 'Description: 2D physics engine'                . "\n";
-  print $fh 'Version: ' . $version                          . "\n";
-  print $fh 'Cflags: -I${includedir} -I${includedir}/Box2D' . "\n";
-  print $fh 'Libs: -L${libdir} -lBox2D'                     . "\n";
+  print $fh 'prefix=' . $install             . "\n";
+  print $fh 'exec_prefix=${prefix}'          . "\n";
+  print $fh 'includedir=${prefix}/include'   . "\n";
+  print $fh 'libdir=${prefix}/lib'           . "\n";
+  print $fh                                    "\n";
+  print $fh 'Name: Box2D'                    . "\n";
+  print $fh 'Description: 2D physics engine' . "\n";
+  print $fh 'Version: ' . $version           . "\n";
+  print $fh 'Libs: -L${libdir} -lBox2D'      . "\n";
+  print $fh 'Cflags: -I${includedir} -I${includedir}/Box2D -std=c++11' . "\n";
 }
