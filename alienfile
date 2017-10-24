@@ -39,8 +39,9 @@ share {
     $CWD = $extract->child('Box2D')->stringify;
     $build->system('%{premake5}', 'gmake');
 
+    local $ENV{CXXFLAGS} = ($ENV{CXXFLAGS} // '') . ' -fPIC ';
     $CWD = $extract->child(qw( Box2D Build gmake ))->stringify;
-    $build->system('%{make}', 'config=release');
+    $build->system('%{make}', 'config=release', 'Box2D');
 
     # Box2D makefiles do not define an install target
     _install($build);
