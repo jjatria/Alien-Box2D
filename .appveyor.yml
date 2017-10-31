@@ -8,7 +8,7 @@ environment:
       - install_perl: "%install_active_perl%"
         version: "5.24.1.2402"
 
-init:
+install:
   # Install perl
   - cmd: "%install_perl%"
   # Make sure we are in project root
@@ -31,8 +31,7 @@ for:
     except:
       - build
 
-  install:
-    # Module files for this distribution are not in root
+  before_test:
     - cpanm -nq Alien::Build::Plugin::Build::Premake5
     - dzil authordeps | cpanm -nq
     - dzil listdeps   | cpanm -nq
