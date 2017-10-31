@@ -1,0 +1,49 @@
+---
+sudo: false
+language: perl
+perl:
+  - blead
+  - '5.26'
+  - '5.24'
+  - '5.22'
+  - '5.20'
+  - '5.18'
+  - '5.16'
+  - '5.14'
+matrix:
+  allow_failures:
+    - perl: blead
+env:
+  matrix:
+    - ALIEN_INSTALL_TYPE=system
+    - ALIEN_INSTALL_TYPE=share
+  global:
+    - RELEASE_TESTING=1
+    - AUTHOR_TESTING=1
+
+before_script:
+  - export PATH="$HOME/.local/bin:$PATH"
+
+install:
+  # Install a recent premake5 binary
+  - mkdir -p $HOME/.local/bin; wget --quiet -O - https://github.com/premake/premake-core/releases/download/v5.0.0-alpha12/premake-5.0.0-alpha12-linux.tar.gz | tar -xz; mv premake5 $HOME/.local/bin
+  # If testing a system install, install from apt
+  - if [ "$ALIEN_INSTALL_TYPE" == "system" ]; then sudo apt-get -qq update && sudo apt-get install -y libbox2d-dev; fi
+  # Initialise the Travis Perl helpers (but do not call auto!)
+  # For some reason, the build-dist step with this distribution dies
+  # so we do things manually
+  - eval $(curl https://travis-perl.github.io/init)
+  - build-perl
+  - perl -V
+  # On development branches, we install the dependencies using dzil, af, and
+  # some elbow grease (the Premake5 plugin is needed when calling dzil listdeps)
+  - if [ "$TRAVIS_BRANCH" != "build" ]; then cpanm -nq Alien::Build::Plugin::Build::Premake5; fi
+  - if [ "$TRAVIS_BRANCH" != "build" ]; then dzil authordeps --missing | cpanm -nq; fi
+  - if [ "$TRAVIS_BRANCH" != "build" ]; then dzil listdeps   --missing | cpanm -nq; fi
+  - cpanm -nq App::af
+  - af missing | cpanm -nq
+
+script:
+  # We also override the test script. Test with dzil on development branches
+  # and the plain makefile on the build branch
+  - if [ "$TRAVIS_BRANCH" != "build" ]; then dzil test; else perl Makefile.PL && make test; fi
