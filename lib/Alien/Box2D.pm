@@ -22,18 +22,18 @@ Alien::Box2D - Find or build the Box2D library
     use Alien::Box2D;
 
     my $build = Module::Build->new(
-      module_name => 'Any::Box2D::Module',
-      # + other params
-      build_requires => {
-        'Alien::Box2D' => 0,
-        # + others modules
-      },
-      configure_requires => {
-        'Alien::Box2D' => 0,
-        # + others modules
-      },
-      extra_compiler_flags => Alien::Box2D->cflags,
-      extra_linker_flags   => Alien::Box2D->libs,
+        module_name => 'Any::Box2D::Module',
+        # + other params
+        build_requires => {
+            'Alien::Box2D' => 0,
+            # + others modules
+        },
+        configure_requires => {
+            'Alien::Box2D' => 0,
+            # + others modules
+        },
+        extra_compiler_flags => Alien::Box2D->cflags,
+        extra_linker_flags   => Alien::Box2D->libs,
     )->create_build_script;
 
 Please note that Alien::Box2D is required only for building, not for using
